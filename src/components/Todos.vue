@@ -7,12 +7,18 @@
       <span> <span class="complete-box"></span> = Complete </span>
     </div>
     <div class="todos">
-      <div v-for="todo in allTodos" :key="todo.id" class="todo">
+      <div
+        v-for="todo in allTodos"
+        :key="todo.id"
+        :class="{ 'is-complete': todo.completed }"
+        class="todo"
+        @dblclick="dblclick(todo)"
+      >
         {{ todo.title }}
         <i
-          @click="deleteTodo(todo.id)"
-          class="fa fa-trash"
           aria-hidden="true"
+          class="fa fa-trash"
+          @click="deleteTodo(todo.id)"
         ></i>
       </div>
     </div>
@@ -20,12 +26,21 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "Todos",
   methods: {
-    ...mapActions(["fetchTodos", "deleteTodo"]),
+    ...mapActions(["fetchTodos", "deleteTodo", "updateTodo"]),
+    dblclick(todo) {
+      const updTodo = {
+        id: todo.id,
+        title: todo.title,
+        completed: !todo.completed,
+      };
+
+      this.updateTodo(updTodo);
+    },
   },
   computed: mapGetters(["allTodos"]),
   created() {
@@ -40,6 +55,7 @@ export default {
   grid-template-columns: repeat(3, 1fr);
   grid-gap: 1rem;
 }
+
 .todo {
   border: 1px solid #ccc;
   background: #41b883;
@@ -49,6 +65,7 @@ export default {
   position: relative;
   cursor: pointer;
 }
+
 i {
   position: absolute;
   right: 10px;
@@ -56,26 +73,36 @@ i {
   color: #fff;
   transition: 0.2s ease-in-out;
 }
+
 i:hover {
   color: #b84141;
 }
+
 .legend {
   display: flex;
   justify-content: space-around;
   margin-bottom: 1rem;
 }
+
 .complete-box {
   display: inline-block;
   width: 10px;
   height: 10px;
   background: #35495e;
 }
+
 .incomplete-box {
   display: inline-block;
   width: 10px;
   height: 10px;
   background: #41b883;
 }
+
+.is-complete {
+  background: #35495e;
+  color: #fff;
+}
+
 @media (max-width: 500px) {
   .todos {
     grid-template-columns: 1fr;
